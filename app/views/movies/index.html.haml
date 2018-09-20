@@ -4,9 +4,11 @@
 %table#movies
   %thead
     %tr
-      %th Movie Title
+      %th#title_header{params[:sorted] == "title" ? {:class => "hilite"} : {}}  
+        %a= link_to "Movie Title", params.merge(:sorted => "title")
       %th Rating
-      %th Release Date
+      %th#release_date_header{params[:sorted] == "release_date" ? {:class => "hilite"} : {}}
+        %a= link_to "Release Date", params.merge(:sorted => "release_date")
       %th More Info
   %tbody
     - @movies.each do |movie|
