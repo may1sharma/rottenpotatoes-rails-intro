@@ -12,6 +12,23 @@ class MoviesController < ApplicationController
 
   def index
     @movies = Movie.all
+    
+    # Get All Possible Ratings
+    @all_ratings = Movie.all_ratings
+    
+    if params[:ratings] == nil    
+      # If no checkbox is selected, display everything
+      @ratings = {}
+      @all_ratings.each {|key| @ratings[key] = "1"} 
+    else
+      @ratings = params[:ratings]
+    end
+    
+    if @ratings.length > 0
+      @movies = @movies.where(:rating => @ratings.keys)
+    end
+
+    # Sorting the table by selected column
     @order = params[:sorted]
     if @order != nil
       @movies = @movies.order(@order)
