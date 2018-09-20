@@ -11,25 +11,45 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
     
     # Get All Possible Ratings
     @all_ratings = Movie.all_ratings
     
+    # Check for selected ratings
     if params[:ratings] == nil    
-      # If no checkbox is selected, display everything
+      # If nothing is selected but session has previous value stored: Redirect
+      if session[:ratings] != nil
+        params[:ratings] = session[:ratings]
+        return redirect_to params: params
+      end
+      
+      # If nothing is stored in session as well: Select All checkboxes
       @ratings = {}
       @all_ratings.each {|key| @ratings[key] = "1"} 
     else
       @ratings = params[:ratings]
+      # Store the parameters in session variable
+      session[:ratings] = @ratings
     end
     
+    # Remember previous sorting column
+    if params[:sorted] == nil and session[:sorted] != nil
+      params[:sorted] = session[:sorted]
+      return redirect_to params: params
+    end
+    
+    @order = params[:sorted]
+    session[:sorted] = @order
+    
+    # Query the Database
+    @movies = Movie.all
+    
+    # Filter by ratings
     if @ratings.length > 0
       @movies = @movies.where(:rating => @ratings.keys)
     end
 
-    # Sorting the table by selected column
-    @order = params[:sorted]
+    # Sort the table by selected column
     if @order != nil
       @movies = @movies.order(@order)
     end
